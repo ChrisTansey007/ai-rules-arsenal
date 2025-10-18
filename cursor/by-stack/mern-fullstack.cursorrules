@@ -1,0 +1,787 @@
+# MERN Stack Full-Stack Development Rules
+
+# Project: MERN Stack Application
+# Stack: MongoDB, Express.js, React 18, Node.js 20 LTS, TypeScript
+# Last Updated: 2025-01-18
+
+## 🎯 Project Overview
+
+You are an expert full-stack developer specializing in the MERN stack with TypeScript.
+Build production-ready, scalable, and maintainable applications following modern best practices.
+
+## 📦 Tech Stack
+
+### Backend
+- Node.js: 20 LTS
+- Express.js: 4.18+
+- MongoDB: 6+
+- Mongoose: 8+
+- TypeScript: 5.3+
+
+### Frontend
+- React: 18.2+
+- React Router: 6+
+- TanStack Query: 5+
+- Zustand: 4+
+- Vite: 5+
+- TailwindCSS: 3.4+
+
+### Shared
+- Zod: 3+ (validation)
+- TypeScript: 5.3+ (everywhere)
+
+### Testing
+- Backend: Jest + Supertest
+- Frontend: Vitest + Testing Library
+- E2E: Playwright
+
+## 📁 Monorepo Structure
+
+```
+/
+├── apps/
+│   ├── api/                  # Express backend
+│   │   ├── src/
+│   │   │   ├── controllers/  # Request handlers
+│   │   │   ├── services/     # Business logic
+│   │   │   ├── models/       # Mongoose models
+│   │   │   ├── middleware/   # Express middleware
+│   │   │   ├── routes/       # Route definitions
+│   │   │   ├── utils/        # Helpers
+│   │   │   └── types/        # TypeScript types
+│   │   ├── tests/
+│   │   └── package.json
+│   │
+│   └── web/                  # React frontend
+│       ├── src/
+│       │   ├── components/   # Reusable components
+│       │   ├── features/     # Feature modules
+│       │   ├── hooks/        # Custom hooks
+│       │   ├── lib/          # Utilities
+│       │   ├── pages/        # Route pages
+│       │   ├── types/        # TypeScript types
+│       │   └── main.tsx
+│       ├── tests/
+│       └── package.json
+│
+├── packages/
+│   ├── shared/               # Shared types/utils
+│   │   ├── types/            # Shared TypeScript types
+│   │   ├── schemas/          # Zod schemas
+│   │   └── utils/            # Shared utilities
+│   └── config/               # Shared configs
+│
+├── package.json              # Root workspace config
+└── pnpm-workspace.yaml       # PNPM workspaces
+```
+
+## 🎨 Code Style
+
+### General Principles
+- Write concise, technical TypeScript code with accurate examples
+- Use functional and declarative programming patterns
+- Prefer iteration and modularization over code duplication
+- Use descriptive variable names with auxiliary verbs (isLoading, hasError)
+- Always use TypeScript strict mode
+- No `any` types - use `unknown` with type guards
+
+### Naming Conventions
+- **Files**: camelCase for utilities, PascalCase for components
+- **Components**: PascalCase (UserProfile.tsx)
+- **Functions**: camelCase (fetchUser, validateEmail)
+- **Constants**: SCREAMING_SNAKE_CASE (API_BASE_URL)
+- **Types/Interfaces**: PascalCase (User, UserRole)
+- **Hooks**: camelCase with 'use' prefix (useAuth, useFetch)
+
+## 🔙 Backend Patterns (Express + MongoDB)
+
+### Controller Pattern
+
+```typescript
+// ✅ GOOD - Thin controllers
+// src/controllers/user.controller.ts
+import { Request, Response, NextFunction } from 'express';
+import { userService } from '../services/user.service';
+import { CreateUserSchema } from '@shared/schemas';
+
+export const createUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Validate
+    const data = CreateUserSchema.parse(req.body);
+    
+    // Delegate to service
+    const user = await userService.create(data);
+    
+    // Return response
+    res.status(201).json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+```
+
+### Service Layer Pattern
+
+```typescript
+// ✅ GOOD - Business logic in services
+// src/services/user.service.ts
+import { User } from '../models/user.model';
+import { hashPassword } from '../utils/crypto';
+import type { CreateUserInput } from '@shared/types';
+
+export const userService = {
+  async create(data: CreateUserInput) {
+    // Business logic
+    const hashedPassword = await hashPassword(data.password);
+    
+    // Create user
+    const user = await User.create({
+      ...data,
+      password: hashedPassword,
+    });
+    
+    // Return without password
+    return user.toObject({ 
+      versionKey: false,
+      transform: (doc, ret) => {
+        delete ret.password;
+        return ret;
+      }
+    });
+  },
+  
+  async findById(id: string) {
+    const user = await User.findById(id).select('-password');
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+    return user;
+  },
+};
+```
+
+### Mongoose Model Pattern
+
+```typescript
+// ✅ GOOD - Typed Mongoose models
+// src/models/user.model.ts
+import mongoose, { Document, Schema } from 'mongoose';
+import type { User as IUser } from '@shared/types';
+
+export interface UserDocument extends IUser, Document {
+  _id: mongoose.Types.ObjectId;
+}
+
+const userSchema = new Schema<UserDocument>(
+  {
+    email: { 
+      type: String, 
+      required: true, 
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    password: { 
+      type: String, 
+      required: true,
+      select: false, // Don't include in queries by default
+    },
+    name: { 
+      type: String, 
+      required: true,
+      trim: true,
+    },
+    role: { 
+      type: String, 
+      enum: ['admin', 'user'],
+      default: 'user',
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (doc, ret) => {
+        ret.id = ret._id.toString();
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
+  }
+);
+
+// Indexes
+userSchema.index({ email: 1 });
+
+export const User = mongoose.model<UserDocument>('User', userSchema);
+```
+
+### Middleware Pattern
+
+```typescript
+// ✅ GOOD - Reusable middleware
+// src/middleware/auth.middleware.ts
+import { Request, Response, NextFunction } from 'express';
+import { verifyToken } from '../utils/jwt';
+import { UnauthorizedError } from '../utils/errors';
+
+export interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    role: string;
+  };
+}
+
+export const authenticate = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      throw new UnauthorizedError('No token provided');
+    }
+    
+    const payload = await verifyToken(token);
+    req.user = payload;
+    
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const authorize = (...roles: string[]) => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return next(new UnauthorizedError('Insufficient permissions'));
+    }
+    next();
+  };
+};
+```
+
+### Error Handling
+
+```typescript
+// ✅ GOOD - Custom error classes
+// src/utils/errors.ts
+export class AppError extends Error {
+  constructor(
+    public message: string,
+    public statusCode: number,
+    public code?: string
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(message = 'Resource not found') {
+    super(message, 404, 'NOT_FOUND');
+  }
+}
+
+export class UnauthorizedError extends AppError {
+  constructor(message = 'Unauthorized') {
+    super(message, 401, 'UNAUTHORIZED');
+  }
+}
+
+// ✅ GOOD - Global error handler
+// src/middleware/error.middleware.ts
+export const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      success: false,
+      error: {
+        message: err.message,
+        code: err.code,
+      },
+    });
+  }
+  
+  // Mongoose validation error
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({
+      success: false,
+      error: {
+        message: 'Validation failed',
+        details: err.message,
+      },
+    });
+  }
+  
+  // Log unexpected errors
+  console.error('Unexpected error:', err);
+  
+  res.status(500).json({
+    success: false,
+    error: {
+      message: 'Internal server error',
+    },
+  });
+};
+```
+
+## ⚛️ Frontend Patterns (React + Vite)
+
+### Component Structure
+
+```typescript
+// ✅ GOOD - Functional components with TypeScript
+// src/components/UserCard.tsx
+import { User } from '@shared/types';
+
+interface UserCardProps {
+  user: User;
+  onEdit?: (user: User) => void;
+  onDelete?: (userId: string) => void;
+}
+
+export function UserCard({ user, onEdit, onDelete }: UserCardProps) {
+  return (
+    <div className="rounded-lg border p-4">
+      <h3 className="text-lg font-semibold">{user.name}</h3>
+      <p className="text-gray-600">{user.email}</p>
+      
+      <div className="mt-4 flex gap-2">
+        {onEdit && (
+          <button onClick={() => onEdit(user)}>Edit</button>
+        )}
+        {onDelete && (
+          <button onClick={() => onDelete(user.id)}>Delete</button>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+### Data Fetching with TanStack Query
+
+```typescript
+// ✅ GOOD - Use TanStack Query for server state
+// src/hooks/useUsers.ts
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import type { User, CreateUserInput } from '@shared/types';
+
+export function useUsers() {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: () => api.get<User[]>('/users'),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+export function useUser(id: string) {
+  return useQuery({
+    queryKey: ['users', id],
+    queryFn: () => api.get<User>(`/users/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (data: CreateUserInput) => api.post<User>('/users', data),
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+}
+
+// ❌ BAD - Don't use useEffect for data fetching
+function BadComponent() {
+  const [users, setUsers] = useState([]);
+  
+  useEffect(() => {
+    fetch('/api/users')
+      .then(res => res.json())
+      .then(setUsers);
+  }, []); // BAD
+  
+  return <UserList users={users} />;
+}
+```
+
+### State Management with Zustand
+
+```typescript
+// ✅ GOOD - Zustand for global client state
+// src/lib/store.ts
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { User } from '@shared/types';
+
+interface AuthStore {
+  user: User | null;
+  token: string | null;
+  setAuth: (user: User, token: string) => void;
+  clearAuth: () => void;
+}
+
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      setAuth: (user, token) => set({ user, token }),
+      clearAuth: () => set({ user: null, token: null }),
+    }),
+    {
+      name: 'auth-storage',
+    }
+  )
+);
+```
+
+### Form Handling
+
+```typescript
+// ✅ GOOD - Controlled forms with validation
+// src/components/CreateUserForm.tsx
+import { useState } from 'react';
+import { useCreateUser } from '@/hooks/useUsers';
+import { CreateUserSchema } from '@shared/schemas';
+import { z } from 'zod';
+
+export function CreateUserForm() {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const createUser = useCreateUser();
+  
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+      name: formData.get('name') as string,
+    };
+    
+    try {
+      // Validate
+      CreateUserSchema.parse(data);
+      setErrors({});
+      
+      // Submit
+      await createUser.mutateAsync(data);
+      
+      // Reset form
+      e.currentTarget.reset();
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            fieldErrors[err.path[0].toString()] = err.message;
+          }
+        });
+        setErrors(fieldErrors);
+      }
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="name">Name</label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          required
+          className="w-full rounded border p-2"
+        />
+        {errors.name && <p className="text-red-500">{errors.name}</p>}
+      </div>
+      
+      <div>
+        <label htmlFor="email">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          className="w-full rounded border p-2"
+        />
+        {errors.email && <p className="text-red-500">{errors.email}</p>}
+      </div>
+      
+      <div>
+        <label htmlFor="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          required
+          className="w-full rounded border p-2"
+        />
+        {errors.password && <p className="text-red-500">{errors.password}</p>}
+      </div>
+      
+      <button
+        type="submit"
+        disabled={createUser.isPending}
+        className="rounded bg-blue-600 px-4 py-2 text-white"
+      >
+        {createUser.isPending ? 'Creating...' : 'Create User'}
+      </button>
+    </form>
+  );
+}
+```
+
+## 🔒 Security Best Practices
+
+### Backend Security
+- ✅ Use bcrypt for password hashing (cost factor: 12)
+- ✅ Implement JWT with short expiration (15 min access, 7 day refresh)
+- ✅ Validate all inputs with Zod schemas
+- ✅ Use helmet.js for security headers
+- ✅ Implement rate limiting (express-rate-limit)
+- ✅ Enable CORS with whitelist
+- ✅ Use parameterized queries (Mongoose does this)
+- ✅ Never log sensitive data (passwords, tokens)
+- ✅ Use environment variables for secrets
+- ✅ Implement CSRF protection for cookies
+
+### Frontend Security
+- ✅ Store tokens in httpOnly cookies (preferred) or memory
+- ✅ Never store sensitive data in localStorage
+- ✅ Validate all user inputs client-side (duplicate validation)
+- ✅ Sanitize user-generated content
+- ✅ Implement Content Security Policy
+- ✅ Use HTTPS only in production
+
+## 🧪 Testing Standards
+
+### Backend Tests (Jest + Supertest)
+
+```typescript
+// ✅ GOOD - Integration tests for API endpoints
+// tests/users.test.ts
+import request from 'supertest';
+import { app } from '../src/app';
+import { User } from '../src/models/user.model';
+
+describe('POST /api/users', () => {
+  beforeEach(async () => {
+    await User.deleteMany({});
+  });
+  
+  it('should create a new user', async () => {
+    const userData = {
+      email: 'test@example.com',
+      password: 'SecurePass123!',
+      name: 'Test User',
+    };
+    
+    const response = await request(app)
+      .post('/api/users')
+      .send(userData)
+      .expect(201);
+    
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.email).toBe(userData.email);
+    expect(response.body.data.password).toBeUndefined();
+  });
+  
+  it('should return 400 for invalid email', async () => {
+    const invalidData = {
+      email: 'not-an-email',
+      password: 'SecurePass123!',
+      name: 'Test User',
+    };
+    
+    const response = await request(app)
+      .post('/api/users')
+      .send(invalidData)
+      .expect(400);
+    
+    expect(response.body.success).toBe(false);
+  });
+});
+```
+
+### Frontend Tests (Vitest + Testing Library)
+
+```typescript
+// ✅ GOOD - Component tests
+// src/components/__tests__/UserCard.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import { UserCard } from '../UserCard';
+
+describe('UserCard', () => {
+  const mockUser = {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'user' as const,
+  };
+  
+  it('renders user information', () => {
+    render(<UserCard user={mockUser} />);
+    
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('john@example.com')).toBeInTheDocument();
+  });
+  
+  it('calls onEdit when edit button is clicked', () => {
+    const onEdit = jest.fn();
+    render(<UserCard user={mockUser} onEdit={onEdit} />);
+    
+    fireEvent.click(screen.getByText('Edit'));
+    
+    expect(onEdit).toHaveBeenCalledWith(mockUser);
+  });
+});
+```
+
+## 📝 Documentation Standards
+
+### Code Comments
+```typescript
+// ✅ GOOD - Document complex logic
+/**
+ * Generates a JWT token pair (access + refresh)
+ * 
+ * @param userId - The user's unique identifier
+ * @param role - The user's role for authorization
+ * @returns Object with accessToken and refreshToken
+ * 
+ * @example
+ * const tokens = generateTokens('user-id-123', 'admin');
+ * // { accessToken: '...', refreshToken: '...' }
+ */
+export function generateTokens(userId: string, role: string) {
+  // Implementation
+}
+```
+
+### API Documentation
+- ✅ Use JSDoc for function documentation
+- ✅ Document all API endpoints in README
+- ✅ Include request/response examples
+- ✅ List all possible error codes
+
+## 🚀 Performance Optimization
+
+### Backend
+- ✅ Implement database indexes on frequently queried fields
+- ✅ Use MongoDB aggregation for complex queries
+- ✅ Implement connection pooling (default in Mongoose)
+- ✅ Cache frequently accessed data with Redis
+- ✅ Use compression middleware
+- ✅ Implement pagination for list endpoints
+
+### Frontend
+- ✅ Lazy load routes and heavy components
+- ✅ Use React.memo for expensive components
+- ✅ Implement virtual scrolling for long lists
+- ✅ Optimize images (use WebP, lazy load)
+- ✅ Code splitting with dynamic imports
+- ✅ Use TanStack Query caching effectively
+
+## 🎯 Common Patterns
+
+### API Response Format
+```typescript
+// ✅ Success response
+{
+  "success": true,
+  "data": { /* response data */ }
+}
+
+// ✅ Error response
+{
+  "success": false,
+  "error": {
+    "message": "User-friendly error message",
+    "code": "ERROR_CODE"
+  }
+}
+
+// ✅ Paginated response
+{
+  "success": true,
+  "data": [/* items */],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 100,
+    "pages": 5
+  }
+}
+```
+
+### Environment Variables
+```bash
+# Backend (.env)
+NODE_ENV=development
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/myapp
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=15m
+
+# Frontend (.env)
+VITE_API_URL=http://localhost:5000/api
+```
+
+## ❌ Common Mistakes to Avoid
+
+### Backend
+- ❌ Don't expose MongoDB _id directly (use virtual 'id')
+- ❌ Don't return passwords in API responses
+- ❌ Don't use try-catch without proper error handling
+- ❌ Don't forget to validate inputs
+- ❌ Don't use any type in TypeScript
+
+### Frontend
+- ❌ Don't use useEffect for data fetching
+- ❌ Don't store tokens in localStorage
+- ❌ Don't forget loading and error states
+- ❌ Don't prop drill (use context or Zustand)
+- ❌ Don't mutate state directly
+
+## 📋 Deployment Checklist
+
+### Backend
+- [ ] Environment variables set
+- [ ] MongoDB connection secured
+- [ ] JWT secrets configured
+- [ ] CORS whitelist configured
+- [ ] Rate limiting enabled
+- [ ] Error logging setup (Sentry)
+- [ ] Health check endpoint: GET /health
+- [ ] All tests passing
+
+### Frontend
+- [ ] API URL configured for production
+- [ ] Build optimized: npm run build
+- [ ] Environment variables set
+- [ ] Error boundaries implemented
+- [ ] Analytics setup
+- [ ] All tests passing
+
+---
+
+**This configuration ensures consistent, production-ready code across the entire MERN stack!**

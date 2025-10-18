@@ -1,0 +1,173 @@
+# [Project Name] - Cursor Rules
+
+# Project: [Your Project Name]
+# Stack: [List your tech stack]
+# Last Updated: YYYY-MM-DD
+
+## 🎯 Project Overview
+
+You are an expert [role] specializing in [technologies].
+[Brief description of what you're building and coding philosophy]
+
+## 📦 Tech Stack
+
+### [Category 1]
+- [Technology]: [Version]
+- [Technology]: [Version]
+
+### [Category 2]
+- [Technology]: [Version]
+- [Technology]: [Version]
+
+### [Category 3]
+- [Technology]: [Version]
+
+## 📁 Project Structure
+
+```
+[project-root]/
+├── [folder1]/          # [Description]
+│   ├── [subfolder]/
+│   └── [file]
+├── [folder2]/          # [Description]
+└── [config]
+```
+
+## 🎨 Code Style
+
+### General Principles
+- [Principle 1]
+- [Principle 2]
+- [Principle 3]
+
+### Naming Conventions
+- **[Type]**: [Convention] ([example])
+- **[Type]**: [Convention] ([example])
+- **[Type]**: [Convention] ([example])
+
+## [Framework/Language] Patterns
+
+### [Pattern Name]
+
+```[language]
+// ✅ GOOD - [Description]
+[Good code example]
+
+// ❌ AVOID - [Description]
+[Bad code example]
+```
+
+### [Another Pattern]
+
+```[language]
+// ✅ Correct implementation
+[Code example]
+
+// Explanation:
+// [Why this approach is better]
+```
+
+## 🔒 Security Best Practices
+
+### [Security Area]
+- ✅ [Requirement 1]
+- ✅ [Requirement 2]
+- ❌ Never [dangerous practice]
+
+```[language]
+// ✅ Secure pattern
+[Example]
+```
+
+## 🧪 Testing Standards
+
+### [Test Type]
+
+```[language]
+// ✅ Test structure
+[Test example]
+
+// Requirements:
+// - [Requirement 1]
+// - [Requirement 2]
+```
+
+### Coverage Requirements
+- [Type of tests]: [Coverage %]
+- [What to test]
+- [What NOT to test]
+
+## 📝 Documentation Standards
+
+### Code Comments
+```[language]
+/**
+ * [Function description]
+ * 
+ * @param [param] - [Description]
+ * @returns [Description]
+ * 
+ * @example
+ * [Usage example]
+ */
+```
+
+### [Documentation Type]
+- ✅ [Requirement]
+- ✅ [Requirement]
+
+## 🚀 Performance Optimization
+
+### [Performance Area]
+- ✅ [Optimization 1]
+- ✅ [Optimization 2]
+
+```[language]
+// ✅ Optimized approach
+[Example]
+
+// ❌ Slow approach
+[Anti-pattern]
+```
+
+## ❌ Common Mistakes to Avoid
+
+### Mistake 1: [Title]
+```[language]
+// BAD
+[Bad code]
+
+// GOOD
+[Corrected code]
+```
+
+### Mistake 2: [Title]
+```[language]
+// BAD
+[Bad code]
+
+// GOOD
+[Corrected code]
+```
+
+## 📋 Deployment Checklist
+
+- [ ] [Requirement 1]
+- [ ] [Requirement 2]
+- [ ] [Requirement 3]
+- [ ] All tests passing
+- [ ] Build succeeds
+- [ ] [Environment-specific requirements]
+
+## 🎯 [Additional Section]
+
+[Any project-specific patterns or requirements]
+
+```[language]
+// Example
+[Code]
+```
+
+---
+
+**This configuration ensures consistent, [quality adjective] code across the entire [project type]!**
