@@ -689,4 +689,28 @@ export default function Loading() {
 
 ---
 
+## 🔗 Related Arsenal Items
+
+**💭 Memory:**
+- [Next.js App Router Memory](https://github.com/ChrisTansey007/windsurf-memories-arsenal/blob/main/project-types/nextjs-app-router-memory.md) - Complete project context and conventions
+
+**🔄 Workflows:**
+- [Code Review Assistant](https://github.com/ChrisTansey007/ai-workflows-arsenal/blob/main/windsurf/development/code-review-assistant.md) - Review Next.js code
+- [Run Tests and Fix](https://github.com/ChrisTansey007/ai-workflows-arsenal/blob/main/windsurf/development/run-tests-and-fix.md) - Testing automation
+- [Commit and PR](https://github.com/ChrisTansey007/ai-workflows-arsenal/blob/main/windsurf/git-workflows/commit-and-pr.md) - Git workflow
+
+**🔗 Complete Setup:**
+- [Full-Stack Next.js Example](https://github.com/ChrisTansey007/arsenal-integration-hub/tree/main/examples/fullstack-nextjs-app) - See this rule in action
+- [Solo Developer Setup](https://github.com/ChrisTansey007/arsenal-integration-hub/tree/main/examples/solo-developer) - Quick setup guide
+
+**Quick Install:**
+```bash
+# Copy this rule + matching memory + workflows
+cp ~/arsenals/ai-rules-arsenal/windsurf/by-framework/nextjs-app-router.md .windsurf/rules/
+cp ~/arsenals/windsurf-memories-arsenal/project-types/nextjs-app-router-memory.md .windsurf/memories/
+cp ~/arsenals/ai-workflows-arsenal/windsurf/development/*.md .windsurf/workflows/
+```
+
+---
+
 **This rule file helps Cascade/Windsurf understand your Next.js 14 App Router patterns and generate code that follows your standards!**

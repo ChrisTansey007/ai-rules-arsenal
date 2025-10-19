@@ -836,4 +836,29 @@ async def test_get_user(client, db_session):
 
 ---
 
+## 🔗 Related Arsenal Items
+
+**💭 Memory:**
+- [FastAPI Python Memory](https://github.com/ChrisTansey007/windsurf-memories-arsenal/blob/main/project-types/fastapi-memory.md) - Complete project context and conventions
+
+**🔄 Workflows:**
+- [Code Review Assistant](https://github.com/ChrisTansey007/ai-workflows-arsenal/blob/main/windsurf/development/code-review-assistant.md) - Review FastAPI code
+- [Run Tests and Fix](https://github.com/ChrisTansey007/ai-workflows-arsenal/blob/main/windsurf/development/run-tests-and-fix.md) - Pytest automation
+- [Security Scan](https://github.com/ChrisTansey007/ai-workflows-arsenal/blob/main/windsurf/code-quality/security-scan.md) - API security checks
+
+**🔗 Complete Setup:**
+- [API Service Example](https://github.com/ChrisTansey007/arsenal-integration-hub/tree/main/examples/api-service) - See this rule in action
+- [Full-Stack App Example](https://github.com/ChrisTansey007/arsenal-integration-hub/tree/main/examples/fullstack-nextjs-app) - FastAPI backend setup
+
+**Quick Install:**
+```bash
+# Copy this rule + matching memory + workflows
+cp ~/arsenals/ai-rules-arsenal/windsurf/by-framework/fastapi-python.md .windsurf/rules/
+cp ~/arsenals/windsurf-memories-arsenal/project-types/fastapi-memory.md .windsurf/memories/
+cp ~/arsenals/ai-workflows-arsenal/windsurf/development/*.md .windsurf/workflows/
+cp ~/arsenals/ai-workflows-arsenal/windsurf/code-quality/security-scan.md .windsurf/workflows/
+```
+
+---
+
 **This rule file ensures Cascade generates clean, production-ready FastAPI code following modern Python best practices!**
