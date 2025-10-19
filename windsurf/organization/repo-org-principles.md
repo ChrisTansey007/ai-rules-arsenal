@@ -498,4 +498,29 @@ You've succeeded when:
 
 ---
 
+## 🔗 Related Arsenal Items
+
+**🔄 Workflow:**
+- [Repository File Organization](https://github.com/ChrisTansey007/ai-workflows-arsenal/blob/main/windsurf/project-organization/repo-organize-files.md) - 3-phase workflow that applies these principles
+
+**🤖 Script:**
+- [Safe File Migration Script](https://github.com/ChrisTansey007/ai-scripts-arsenal/tree/main/scripts/repository-management/migrate-files) - Automated migration following these principles
+
+**🔗 Complete Example:**
+- [Repository Organization Example](https://github.com/ChrisTansey007/arsenal-integration-hub/tree/main/examples/repo-organization) - Real-world implementation
+
+### Quick Setup
+
+```bash
+# Install Arsenal repos
+curl -sSL https://raw.githubusercontent.com/ChrisTansey007/arsenal-integration-hub/main/scripts/install-all.sh | bash
+
+# Copy this rule + workflow + script
+cp ~/arsenals/ai-rules-arsenal/windsurf/organization/repo-org-principles.md .windsurf/rules/
+cp ~/arsenals/ai-workflows-arsenal/windsurf/project-organization/repo-organize-files.md .windsurf/workflows/
+cp ~/arsenals/ai-scripts-arsenal/scripts/repository-management/migrate-files/migrate-files-safe.ps1 ./scripts/
+```
+
+---
+
 **Remember: Good organization is invisible. If team members have to think about where files go, the system needs improvement.** 🎯
