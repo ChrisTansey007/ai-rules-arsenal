@@ -98,6 +98,7 @@ ai-rules-arsenal/
 │   ├── by-language/            # Python, TypeScript, Rust, Go
 │   ├── by-framework/           # Next.js, FastAPI, Django, React
 │   ├── by-domain/              # Security, Performance, Testing
+│   ├── database/               # Database operations, async, SQL
 │   ├── organization/           # Repository organization principles
 │   └── templates/              # Empty templates to start from
 │
