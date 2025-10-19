@@ -96,9 +96,10 @@ ai-rules-arsenal/
 │
 ├── windsurf/                    # Windsurf/Cascade rules
 │   ├── by-language/            # Python, TypeScript, Rust, Go
-│   ├── by-framework/           # Next.js, FastAPI, Django, React
+│   ├── by-framework/           # Next.js, FastAPI, Django, React, Vite
 │   ├── by-domain/              # Security, Performance, Testing
 │   ├── database/               # Database operations, async, SQL
+│   ├── documentation/          # Documentation standards, email setup guides
 │   ├── organization/           # Repository organization principles
 │   └── templates/              # Empty templates to start from
 │
