@@ -1,3 +1,12 @@
+---
+id: rule.nextjs-app-router
+type: rule
+title: Next.js 14 App Router Development Rules
+tags: [nextjs, react, app-router, typescript, frontend]
+summary: Development rules and conventions for Next.js 14+ App Router projects with React Server Components and TypeScript.
+version: 1
+---
+
 # Next.js 14 App Router Development Rules
 
 **Activation Mode:** Glob: `app/**/*.{ts,tsx}`  

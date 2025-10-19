@@ -1,8 +1,17 @@
+---
+id: rule.fastapi-python
+type: rule
+title: FastAPI Python Backend Development Rules
+tags: [fastapi, python, backend, api, async]
+summary: Development rules and conventions for FastAPI backend projects with async patterns, type hints, and modern Python best practices.
+version: 1
+---
+
 # FastAPI Python Backend Development Rules
 
-**Activation Mode:** Glob: `**/*.py`  
+**Activation Mode:** Glob: `app/**/*.py`  
 **Last Updated:** 2025-01-18  
-**Tested With:** Windsurf Cascade, Python 3.11+, FastAPI 0.104+
+**Tested With:** Windsurf Cascade, FastAPI 0.104+, Python 3.10+
 
 ---
 

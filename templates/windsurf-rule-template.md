@@ -1,3 +1,12 @@
+---
+id: rule.template-windsurf
+type: rule
+title: Windsurf Development Rule Template
+tags: [template, windsurf, documentation, howto]
+summary: Template for creating new Windsurf development rules with standardized structure and front-matter.
+version: 1
+---
+
 # [Your Framework/Language Name] - Windsurf Development Rules
 
 **Activation Mode:** [Choose: Always On / Manual / Model Decision / Glob: pattern]  

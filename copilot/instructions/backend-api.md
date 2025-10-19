@@ -1,3 +1,12 @@
+---
+id: rule.copilot-backend-api
+type: rule
+title: Backend API Development - GitHub Copilot Instructions
+tags: [copilot, backend, api, rest, instructions]
+summary: GitHub Copilot instructions for RESTful API backend development with best practices and coding conventions.
+version: 1
+---
+
 # Backend API Development - GitHub Copilot Instructions
 
 **Project Type:** RESTful API Backend  

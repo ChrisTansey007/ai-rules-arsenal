@@ -1,3 +1,12 @@
+---
+id: rule.template-copilot
+type: rule
+title: GitHub Copilot Instructions Template
+tags: [template, copilot, documentation, howto]
+summary: Template for creating new GitHub Copilot instructions with standardized structure and front-matter.
+version: 1
+---
+
 # [Project Name] - GitHub Copilot Instructions
 
 **Project Type:** [Web App / API / Mobile App / Library / etc.]  

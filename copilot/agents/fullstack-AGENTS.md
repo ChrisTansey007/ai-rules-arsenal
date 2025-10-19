@@ -1,3 +1,12 @@
+---
+id: rule.copilot-fullstack-agent
+type: rule
+title: Full-Stack Application - GitHub Copilot Coding Agent Instructions
+tags: [copilot, fullstack, agent, automation, instructions]
+summary: GitHub Copilot Coding Agent instructions for autonomous full-stack web application development with end-to-end best practices.
+version: 1
+---
+
 # Full-Stack Application - GitHub Copilot Coding Agent Instructions
 
 **Project Type:** Full-Stack Web Application  
