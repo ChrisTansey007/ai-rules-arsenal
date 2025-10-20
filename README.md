@@ -100,6 +100,7 @@ ai-rules-arsenal/
 │   ├── by-domain/              # Security, Performance, Testing
 │   ├── database/               # Database operations, async, SQL
 │   ├── documentation/          # Documentation standards, email setup guides
+│   ├── prompt-design/          # Prompt quality standards, evaluation frameworks
 │   ├── organization/           # Repository organization principles
 │   └── templates/              # Empty templates to start from
 │
